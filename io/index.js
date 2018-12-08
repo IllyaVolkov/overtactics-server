@@ -26,7 +26,7 @@ function Player(xPos, yPos, socket, team) {
 }
 
 function prefetchPlayersData() {
-    var prefetchedGamestate = gamestates.data[0];
+    var prefetchedGamestate = Object.assign({}, gamestates.data[0]);
     var playersdata = players.data;
     prefetchedGamestate.teamA = playersdata.filter((p) => prefetchedGamestate.teamA.some(el => el === p.$loki));
     prefetchedGamestate.teamB = playersdata.filter((p) => prefetchedGamestate.teamB.some(el => el === p.$loki));
@@ -101,12 +101,19 @@ function indexIo(io, socket) {
             var skill = skills.data.find(s => s.id === hero.skill);
             player.hero = heroId; // TODO: check for a valid id
             players.update(player);
-            socket.emit('onSelectHero', {player});
 
             hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam || gamestate.teamB.length < gamestate.playersInTeam;
             var playesIds = [...gamestate.teamA, ...gamestate.teamB];
             var playersInGame = players.data.filter((data) => playesIds.some(el => el === data.$loki));
             var hasHeroes = playersInGame.reduce((accumulator, value) => accumulator && !!value.hero, true);
+            var prefetchedGamestate = prefetchPlayersData();
+
+            playersInGame.forEach(p => {
+                io.to(p.socket).emit('onSelectHero', {
+                    gameState: prefetchedGamestate,
+                    player: p
+                });
+            });
 
             if (!hasFreePlaces && hasHeroes) {
                 gamestate.started = true;
