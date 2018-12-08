@@ -6,8 +6,8 @@ var db = new loki('mock.json', {autosave: true, autosaveInterval: 5000, autoload
 var skills, heroes;
 
 function dbLoadCallback() {
-    heroes = db.getCollection('heroes');
-    skills = db.getCollection('skills');
+    heroes = db.getCollection('heroes') || db.addCollection('heroes', { unique: ['id'] });
+    skills = db.getCollection('skills') || db.addCollection('skills', { unique: ['id'] });
 };
 
 /* GET home page. */

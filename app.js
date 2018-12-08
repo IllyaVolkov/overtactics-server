@@ -8,6 +8,7 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var heroesRouter = require('./routes/heroes');
 var skillsRouter = require('./routes/skills');
+var gamestateRouter = require('./routes/gamestate');
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/io', indexRouter);
 app.use('/heroes', heroesRouter);
 app.use('/skills', skillsRouter);
+app.use('/gamestate', gamestateRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
