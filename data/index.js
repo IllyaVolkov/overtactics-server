@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const heroesFolder = './data/heroes/';
 const skillsFolder = './data/skills/';
-const defaultGameState = './data/DEFAULT_GAME_STATE.json/';
+const defaultGameState = './data/DEFAULT_GAME_STATE.json';
 
 function saveHeroes(collection) {
     fs.readdir(heroesFolder, (err, files) => {
