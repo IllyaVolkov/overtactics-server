@@ -13,8 +13,10 @@ function dbLoadCallback() {
 /* GET home page. */
 router.post('/', function(req, res, next) {
     var data = heroes.data;
+    var skillsdata = skills.data;
+
     data.forEach((hero) => {
-        hero.skill = skills.findOne({'id': hero.skill});
+        hero.skill = skillsdata.find((data) => hero.skill === data.id);
     });
     res.send(data);
 });
