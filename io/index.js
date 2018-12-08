@@ -84,8 +84,10 @@ function indexIo(io, socket) {
         socket.emit('onConnect', {success: true});
 
         socket.on('selectHero', ({heroId}) => {
+            gamestate.teamA = gamestate.teamA.filter(p => !!p);
+            gamestate.teamB = gamestate.teamB.filter(p => !!p);
             var isTeamA = gamestate.teamA.length < gamestate.playersInTeam;
-            var playerXPos = isTeamA ? 0 : gamestate.xNum;
+            var playerXPos = isTeamA ? 0 : gamestate.xNum - 1;
             var playerYPos = gamestate.teamA.length * 2;
             var player = new Player(playerXPos, playerYPos, socket.id, isTeamA ? 'A' : 'B');
 
