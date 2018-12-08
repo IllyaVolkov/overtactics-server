@@ -5,11 +5,5 @@
   "Move Range": 5,
   "Attack Range": 2,
   "Attack Damage": 38,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 3,
-    "Name": "SWIFT STRIKE",
-    "Range": 7,
-    "Damage": 62
-  }
+  "skill": 13
 }

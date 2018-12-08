@@ -5,11 +5,5 @@
   "Move Range": 2,
   "Attack Range": 6,
   "Attack Damage": 33,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 4,
-    "Name": "SONIC ARROW",
-    "Range": 7,
-    "Damage": 54
-  }
+  "skill": 12
 }

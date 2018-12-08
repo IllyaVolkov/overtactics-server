@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 4,
   "Attack Damage": 40,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 4,
-    "Name": "COALESCENCE",
-    "Range": 6,
-    "Damage": 64
-  }
+  "skill": 2
 }

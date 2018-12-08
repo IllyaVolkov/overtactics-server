@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 3,
   "Attack Damage": 34,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 3,
-    "Name": "ROCKET FLAIL",
-    "Range": 5,
-    "Damage": 43
-  }
+  "skill": 8
 }

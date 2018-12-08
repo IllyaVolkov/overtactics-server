@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 2,
   "Attack Damage": 42,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 4,
-    "Name": "ROCKET PUNCH",
-    "Range": 3,
-    "Damage": 54
-  }
+  "skill": 10
 }

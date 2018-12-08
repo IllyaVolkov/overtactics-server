@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 5,
   "Attack Damage": 38,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 4,
-    "Name": "CADUCEUS BLASTER",
-    "Range": 5,
-    "Damage": 59
-  }
+  "skill": 1
 }

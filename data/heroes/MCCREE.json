@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 3,
   "Attack Damage": 35,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 5,
-    "Name": "SONIC AMPLIFIER",
-    "Range": 6,
-    "Damage": 70
-  }
+  "skill": 11
 }

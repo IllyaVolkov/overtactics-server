@@ -5,11 +5,5 @@
   "Move Range": 4,
   "Attack Range": 2,
   "Attack Damage": 45,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 4,
-    "Name": "TANK",
-    "Range": 2,
-    "Damage": 68
-  }
+  "skill": 14
 }

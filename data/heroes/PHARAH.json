@@ -5,11 +5,5 @@
   "Move Range": 3,
   "Attack Range": 4,
   "Attack Damage": 39,
-  "skill": {
-    "Points": 0,
-    "Points Limit": 3,
-    "Name": "ROCKET LAUNCHER",
-    "Range": 5,
-    "Damage": 58
-  }
+  "skill": 9
 }
