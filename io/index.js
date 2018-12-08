@@ -16,9 +16,16 @@ function dbLoadCallback() {
 };
 
 function indexIo(socket) {
-    const gameId = socket.gameId = 1;
-    const heroId = socket.userId = socket.handshake.query.heroId;
+    var gamestate = gamestates.data[0];
+    var hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam
+        || gamestate.teamB.length < gamestate.playersInTeam;
 
+    if (hasFreePlaces) {
+        socket.emit('onConnect', {success: true});
+    } else {
+        socket.emit('onConnect', {success: false});
+        socket.disconnect();
+    }
 }
 
 module.exports = indexIo;
