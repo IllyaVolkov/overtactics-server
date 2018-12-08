@@ -158,7 +158,7 @@ function indexIo(io, socket) {
                                 players.update(player);
                                 break;
                             }
-                            case 'skills': {
+                            case 'skill': {
                                 var xCoord = data.x;
                                 var yCoord = data.y;
                                 var canSpell = xCoord >= 0 && xCoord < gamestates.xNum
