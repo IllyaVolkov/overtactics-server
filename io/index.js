@@ -95,6 +95,7 @@ function indexIo(io, socket) {
         gamestates.update(gamestate);
 
         socket.emit('onConnect', {success: true});
+        socket.emit('test', {success: true});
 
         socket.on('selectHero', ({heroId}) => {
             var hero = heroes.data.find(h => h.id === heroId);
