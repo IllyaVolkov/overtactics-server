@@ -1,0 +1,15 @@
+{
+  "id": 7,
+  "name":"JUNKRAT",
+  "hp": 210,
+  "Move Range": 4,
+  "Attack Range": 3,
+  "Attack Damage": 37,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 4,
+    "Name": "FRAG LAUNCHER",
+    "Range": 5,
+    "Damage": 48
+  }
+}

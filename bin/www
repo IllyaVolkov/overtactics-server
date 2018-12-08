@@ -5,8 +5,10 @@
  */
 
 var app = require('../app');
+var ioIndex = require("../io/index");
 var debug = require('debug')('overtactics-server:server');
 var http = require('http');
+var socketIo = require("socket.io");
 
 /**
  * Get port from environment and store in Express.
@@ -20,12 +22,14 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = socketIo(server);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 server.listen(port);
+io.on('connect', ioIndex);
 server.on('error', onError);
 server.on('listening', onListening);
 

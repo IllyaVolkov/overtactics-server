@@ -1,0 +1,15 @@
+{
+  "id": 16,
+  "name":"SOMBRA",
+  "hp": 179,
+  "Move Range": 2,
+  "Attack Range": 6,
+  "Attack Damage": 37,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 3,
+    "Name": "EMP!",
+    "Range": 7,
+    "Damage": 65
+  }
+}

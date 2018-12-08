@@ -1,0 +1,15 @@
+{
+  "id": 8,
+  "name":"LUCIO",
+  "hp": 198,
+  "Move Range": 3,
+  "Attack Range": 5,
+  "Attack Damage": 36,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 4,
+    "Name": "SONIC AMPLIFIER",
+    "Range": 6,
+    "Damage": 50
+  }
+}

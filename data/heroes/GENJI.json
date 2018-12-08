@@ -1,0 +1,15 @@
+{
+  "id": 5,
+  "name":"GENJI",
+  "hp": 178,
+  "Move Range": 5,
+  "Attack Range": 2,
+  "Attack Damage": 38,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 3,
+    "Name": "SWIFT STRIKE",
+    "Range": 7,
+    "Damage": 62
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": 1,
+  "name":"ASHE",
+  "hp": 187,
+  "Move Range": 1,
+  "Attack Range": 5,
+  "Attack Damage": 27,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 4,
+    "Name": "THE VIPER",
+    "Range": 6,
+    "Damage": 49
+  }
+}

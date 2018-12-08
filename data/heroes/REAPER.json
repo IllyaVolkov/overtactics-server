@@ -1,0 +1,15 @@
+{
+  "id": 14,
+  "name":"REAPER",
+  "hp": 170,
+  "Move Range": 1,
+  "Attack Range": 8,
+  "Attack Damage": 33,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 5,
+    "Name": "DEATH BLOSSOM!",
+    "Range": 8,
+    "Damage": 80
+  }
+}

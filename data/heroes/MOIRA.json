@@ -1,0 +1,15 @@
+{
+  "id": 11,
+  "name":"MOIRA",
+  "hp": 190,
+  "Move Range": 3,
+  "Attack Range": 4,
+  "Attack Damage": 40,
+  "skill": {
+    "Points": 0,
+    "Points Limit": 4,
+    "Name": "COALESCENCE",
+    "Range": 6,
+    "Damage": 64
+  }
+}
