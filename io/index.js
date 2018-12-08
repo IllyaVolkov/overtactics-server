@@ -14,12 +14,14 @@ function dbLoadCallback() {
     dataStorage.saveGameStates(gamestates);
 };
 
-function Player(xPos, yPos) {
+function Player(xPos, yPos, socket) {
     this.hero = null;
     this.xPos = xPos;
     this.yPos = yPos;
     this.damage = 0;
     this.points = 0;
+    this.turn = false;
+    this.socket = socket;
 }
 
 function indexIo(socket) {
@@ -31,9 +33,8 @@ function indexIo(socket) {
         var isTeamA = gamestate.teamA.length < gamestate.playersInTeam;
         var playerXPos = isTeamA ? 0 : gamestate.xNum;
         var playerYPos = gamestate.teamA.length * 2;
-        var player = new Player(playerXPos, playerYPos);
+        var player = new Player(playerXPos, playerYPos, socket);
 
-        gamestate.sockets.push(socket);
         player = players.insert(player);
         if (isTeamA) {
             gamestate.teamA.push(player.$loki);
@@ -57,7 +58,22 @@ function indexIo(socket) {
             if (!hasFreePlaces && hasHeroes) {
                 gamestate.started = true;
                 gamestates.update(gamestate);
-                socket.emit('gameStart', {gameState: gamestate});
+                var activePlayer = players.data[0];
+                activePlayer.turn = true;
+                players.update(activePlayer);
+
+                // Prefetch players data
+                var data = gamestate.data[0];
+                var playersdata = players.data;
+                data.teamA = playersdata.find((data) => data.teamA.some(el => el === data.$loki));
+                data.teamB = playersdata.find((data) => data.teamB.some(el => el === data.$loki));
+
+                players.data.forEach(p => {
+                    p.socket.emit('gameStart', {
+                        gameState: data,
+                        player: p
+                    });
+                });
             }
         });
 
@@ -74,9 +90,8 @@ function indexIo(socket) {
                 gamestate.started = false;
                 gamestate.teamA = [];
                 gamestate.teamB = [];
-                gamestate.sockets.forEach(s => {s.disconnect()});
-                gamestate.sockets = [];
                 gamestates.update(gamestate);
+                players.data.forEach(p => {p.socket.disconnect()});
                 players.clear();
             }
         });

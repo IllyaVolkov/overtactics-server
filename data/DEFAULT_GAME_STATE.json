@@ -5,6 +5,5 @@
   "playersInTeam": 2,
   "teamA": [],
   "teamB": [],
-  "started": false,
-  "sockets": []
+  "started": false
 }
