@@ -67,9 +67,11 @@ function setNextActivePlayer(prefetchedGamestate) {
             }
         }
     });
-    previousActivePlayer.turn = false;
+    if (previousActivePlayer) {
+        previousActivePlayer.turn = false;
+        players.update(previousActivePlayer);
+    }
     activePlayer.turn = true;
-    players.update(previousActivePlayer);
     players.update(activePlayer);
 }
 
@@ -94,7 +96,7 @@ function indexIo(io, socket) {
 
         socket.emit('onConnect', {success: true});
 
-        socket.once('selectHero', ({heroId}) => {
+        socket.on('selectHero', ({heroId}) => {
             var hero = heroes.data.find(h => h.id === heroId);
             var skill = skills.data.find(s => s.id === hero.skill);
             player.hero = heroId; // TODO: check for a valid id
@@ -113,8 +115,8 @@ function indexIo(io, socket) {
                 activePlayer.turn = true;
                 players.update(activePlayer);
 
-                players.data.forEach(p => {
-                    io.to(p.socket).emit('gameStart', {
+                playersInGame.forEach(p => {
+                    io.to(p.socket).emit('onGameStart', {
                         gameState: prefetchedGamestate,
                         player: p
                     });
@@ -182,15 +184,15 @@ function indexIo(io, socket) {
                         setNextActivePlayer(prefetchedGamestate);
 
                         socket.emit('onGameEvent', {success: true});
-                        players.data.forEach(p => {
-                            io.to(p.socket).emit('gameUpdated', {
+                        playersInGame.forEach(p => {
+                            io.to(p.socket).emit('onGameUpdated', {
                                 gameState: prefetchedGamestate,
                                 player: p
                             });
                         });
 
                         if (result) {
-                            io.sockets.emit('gameEnded', {winner: result});
+                            io.sockets.emit('onGameEnded', {winner: result});
                             Object.values(io.of("/").connected.forEach(() => {
                                 s.disconnect();
                             }));
@@ -217,7 +219,7 @@ function indexIo(io, socket) {
                 gamestate.teamA = [];
                 gamestate.teamB = [];
                 gamestates.update(gamestate);
-                players.data.forEach(p => {io.to(p.socket).emit('gameAborted')});
+                players.data.forEach(p => {io.to(p.socket).emit('onGameAborted')});
                 players.clear();
             }
         });
