@@ -41,6 +41,9 @@ function indexIo(socket) {
             gamestate.teamB.push(player.$loki);
         }
         gamestates.update(gamestate);
+        console.log(gamestate);
+        console.log(player);
+
         socket.emit('onConnect', {success: true});
 
         socket.on('selectHero', ({heroId}) => {
@@ -48,6 +51,8 @@ function indexIo(socket) {
             players.update(player);
             hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam || gamestate.teamB.length < gamestate.playersInTeam;
             var hasHeroes = players.data.reduce((accumulator, value) => {accumulator && !!value.hero}, true);
+            console.log(gamestate);
+            console.log(player);
 
             if (!hasFreePlaces && hasHeroes) {
                 gamestate.started = true;
