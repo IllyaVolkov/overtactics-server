@@ -81,22 +81,21 @@ function indexIo(io, socket) {
         || gamestate.teamB.length < gamestate.playersInTeam;
 
     if (hasFreePlaces) {
-        var isTeamA = gamestate.teamA.length < gamestate.playersInTeam;
-        var playerXPos = isTeamA ? 0 : gamestate.xNum;
-        var playerYPos = gamestate.teamA.length * 2;
-        var player = new Player(playerXPos, playerYPos, socket.id, isTeamA ? 'A' : 'B');
-
-        player = players.insert(player);
-        if (isTeamA) {
-            gamestate.teamA.push(player.$loki);
-        } else {
-            gamestate.teamB.push(player.$loki);
-        }
-        gamestates.update(gamestate);
-
         socket.emit('onConnect', {success: true});
 
         socket.on('selectHero', ({heroId}) => {
+            var isTeamA = gamestate.teamA.length < gamestate.playersInTeam;
+            var playerXPos = isTeamA ? 0 : gamestate.xNum;
+            var playerYPos = gamestate.teamA.length * 2;
+            var player = new Player(playerXPos, playerYPos, socket.id, isTeamA ? 'A' : 'B');
+
+            player = players.insert(player);
+            if (isTeamA) {
+                gamestate.teamA.push(player.$loki);
+            } else {
+                gamestate.teamB.push(player.$loki);
+            }
+            gamestates.update(gamestate);
             var hero = heroes.data.find(h => h.id === heroId);
             var skill = skills.data.find(s => s.id === hero.skill);
             player.hero = heroId; // TODO: check for a valid id
@@ -211,26 +210,26 @@ function indexIo(io, socket) {
                     }
                 });
             }
-        });
 
-        socket.on('disconnect', () => {
-            gamestate = gamestates.data[0];
-            if (!gamestate.started) {
-                if (isTeamA) {
-                    gamestate.teamA = gamestate.teamA.filter(p => p !== player.$loki);
+            socket.on('disconnect', () => {
+                gamestate = gamestates.data[0];
+                if (!gamestate.started) {
+                    if (isTeamA) {
+                        gamestate.teamA = gamestate.teamA.filter(p => p !== player.$loki);
+                    } else {
+                        gamestate.teamB = gamestate.teamB.filter(p => p !== player.$loki);
+                    }
+                    gamestates.update(gamestate);
+                    players.remove(player);
                 } else {
-                    gamestate.teamB = gamestate.teamB.filter(p => p !== player.$loki);
+                    gamestate.started = false;
+                    gamestate.teamA = [];
+                    gamestate.teamB = [];
+                    gamestates.update(gamestate);
+                    players.data.forEach(p => {io.to(p.socket).emit('onGameAborted')});
+                    players.clear();
                 }
-                gamestates.update(gamestate);
-                players.remove(player);
-            } else {
-                gamestate.started = false;
-                gamestate.teamA = [];
-                gamestate.teamB = [];
-                gamestates.update(gamestate);
-                players.data.forEach(p => {io.to(p.socket).emit('onGameAborted')});
-                players.clear();
-            }
+            });
         });
     } else {
         socket.emit('onConnect', {success: false});
