@@ -101,6 +101,8 @@ function indexIo(io, socket) {
             var skill = skills.data.find(s => s.id === hero.skill);
             player.hero = heroId; // TODO: check for a valid id
             players.update(player);
+            socket.emit('onSelectHero', {player});
+
             hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam || gamestate.teamB.length < gamestate.playersInTeam;
             var playesIds = [...gamestate.teamA, ...gamestate.teamB];
             var playersInGame = players.data.filter((data) => playesIds.some(el => el === data.$loki));
