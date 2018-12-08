@@ -29,7 +29,7 @@ var io = socketIo(server);
  */
 
 server.listen(port);
-io.on('connect', ioIndex);
+io.on('connect', ioIndex.bind(ioIndex, io));
 server.on('error', onError);
 server.on('listening', onListening);
 

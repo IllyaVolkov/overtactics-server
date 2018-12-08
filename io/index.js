@@ -24,7 +24,7 @@ function Player(xPos, yPos, socket) {
     this.socket = socket;
 }
 
-function indexIo(socket) {
+function indexIo(io, socket) {
     var gamestate = gamestates.data[0];
     var hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam
         || gamestate.teamB.length < gamestate.playersInTeam;
@@ -33,7 +33,7 @@ function indexIo(socket) {
         var isTeamA = gamestate.teamA.length < gamestate.playersInTeam;
         var playerXPos = isTeamA ? 0 : gamestate.xNum;
         var playerYPos = gamestate.teamA.length * 2;
-        var player = new Player(playerXPos, playerYPos, socket);
+        var player = new Player(playerXPos, playerYPos, socket.id);
 
         player = players.insert(player);
         if (isTeamA) {
@@ -69,7 +69,7 @@ function indexIo(socket) {
                 data.teamB = playersdata.find((data) => data.teamB.some(el => el === data.$loki));
 
                 players.data.forEach(p => {
-                    p.socket.emit('gameStart', {
+                    io.to(p.socket).emit('gameStart', {
                         gameState: data,
                         player: p
                     });
@@ -85,13 +85,14 @@ function indexIo(socket) {
                 } else {
                     gamestate.teamB = gamestate.teamB.filter(p => p.$loki !== player.$loki);
                 }
+                gamestates.update(gamestate);
                 players.remove(player);
             } else {
                 gamestate.started = false;
                 gamestate.teamA = [];
                 gamestate.teamB = [];
                 gamestates.update(gamestate);
-                players.data.forEach(p => {p.socket.disconnect()});
+                players.data.forEach(p => {io.to(p.socket).disconnect()});
                 players.clear();
             }
         });
