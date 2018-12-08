@@ -25,6 +25,54 @@ function Player(xPos, yPos, socket, team) {
     this.team = team;
 }
 
+function prefetchPlayersData() {
+    var prefetchedGamestate = gamestates.data[0];
+    var playersdata = players.data;
+    prefetchedGamestate.teamA = playersdata.filter((p) => prefetchedGamestate.teamA.some(el => el === p.$loki));
+    prefetchedGamestate.teamB = playersdata.filter((p) => prefetchedGamestate.teamB.some(el => el === p.$loki));
+    return prefetchedGamestate;
+}
+
+function gameResult(prefetchedGamestate) {
+    var heroesdata = heroes.data;
+    var teamAAlive = prefetchedGamestate.teamA.filter(p => p.damage > heroesdata.find(h => h.id === p.hero).hp);
+    var teamBAlive = prefetchedGamestate.teamB.filter(p => p.damage > heroesdata.find(h => h.id === p.hero).hp);
+    var gameEnded = !teamAAlive.length || !teamBAlive.length;
+
+    return gameEnded ? null : (!!teamAAlive.length ? 'A' : 'B');
+}
+
+function setNextActivePlayer(prefetchedGamestate) {
+    var previousActivePlayer = prefetchedGamestate.teamA.find(p => p.turn) || prefetchedGamestate.teamB.find(p => p.turn);
+    var activePlayer;
+    prefetchedGamestate.teamA.forEach((p, index) => {
+        if (p.turn) {
+            previousActivePlayer = p;
+
+            if (index === prefetchedGamestate.playersInTeam - 1) {
+                activePlayer = prefetchedGamestate.teamB[0];
+            } else {
+                activePlayer = prefetchedGamestate.teamB[index + 1];
+            }
+        }
+    });
+    prefetchedGamestate.teamB.forEach((p, index) => {
+        if (p.turn) {
+            previousActivePlayer = p;
+
+            if (index === prefetchedGamestate.playersInTeam - 1) {
+                activePlayer = prefetchedGamestate.teamA[0];
+            } else {
+                activePlayer = prefetchedGamestate.teamA[index + 1];
+            }
+        }
+    });
+    previousActivePlayer.turn = false;
+    activePlayer.turn = true;
+    players.update(previousActivePlayer);
+    players.update(activePlayer);
+}
+
 function indexIo(io, socket) {
     var gamestate = gamestates.data[0];
     var hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam
@@ -47,6 +95,8 @@ function indexIo(io, socket) {
         socket.emit('onConnect', {success: true});
 
         socket.once('selectHero', ({heroId}) => {
+            var hero = heroes.data.find(h => h.id === heroId);
+            var skill = skills.data.find(s => s.id === hero.skill);
             player.hero = heroId; // TODO: check for a valid id
             players.update(player);
             hasFreePlaces = gamestate.teamA.length < gamestate.playersInTeam || gamestate.teamB.length < gamestate.playersInTeam;
@@ -58,20 +108,96 @@ function indexIo(io, socket) {
                 gamestate.started = true;
                 gamestates.update(gamestate);
 
-                // Prefetch players data
-                var data = gamestates.data[0];
-                var playersdata = players.data;
-                data.teamA = playersdata.filter((p) => data.teamA.some(el => el === p.$loki));
-                data.teamB = playersdata.filter((p) => data.teamB.some(el => el === p.$loki));
-                var activePlayer = data.teamA[0];
+                var prefetchedGamestate = prefetchPlayersData();
+                var activePlayer = prefetchedGamestate.teamA[0];
                 activePlayer.turn = true;
                 players.update(activePlayer);
 
                 players.data.forEach(p => {
                     io.to(p.socket).emit('gameStart', {
-                        gameState: data,
+                        gameState: prefetchedGamestate,
                         player: p
                     });
+                });
+                socket.on('gameEvent', ({type, data}) => {
+                    if (player.turn && player.damage < hero.hp) {
+                        var playersInGame = players.data.filter((data) => playesIds.some(el => el === data.$loki));
+                        switch (type) {
+                            case 'move': {
+                                var xCoord = data.x;
+                                var yCoord = data.y;
+                                var canMove = xCoord >= 0 && xCoord < gamestates.xNum
+                                    && yCoord >= 0 && yCoord < gamestates.yNum
+                                    && +(player.xPos - xCoord) <= hero['Move Range']
+                                    && +(player.yPos - yCoord) <= hero['Move Range']
+                                    && playersInGame.reduce((val, p) => val && (p.xPos !== xCoord || p.yPos !== yCoord), true);
+                                if (canMove) {
+                                    player.xPos = xCoord;
+                                    player.yPos = yCoord;
+                                }
+                                player.points = (player.points + 1) % skill['Points Limit'];
+                                players.update(player);
+                                break;
+                            }
+                            case 'shoot': {
+                                var xCoord = data.x;
+                                var yCoord = data.y;
+                                var canShoot = xCoord >= 0 && xCoord < gamestates.xNum
+                                    && yCoord >= 0 && yCoord < gamestates.yNum
+                                    && +(player.xPos - xCoord) <= hero['Attack Range']
+                                    && +(player.yPos - yCoord) <= hero['Attack Range']
+                                    && playersInGame.reduce((val, p) => val || (p.xPos === xCoord && p.yPos === yCoord), false);
+                                if (canShoot) {
+                                    var target = playersInGame.find((p) => p.xPos === xCoord && p.yPos === yCoord);
+                                    target.damage += hero['Damage'];
+                                    players.update(target);
+                                }
+                                player.points = (player.points + 1) % skill['Points Limit'];
+                                players.update(player);
+                                break;
+                            }
+                            case 'skills': {
+                                var xCoord = data.x;
+                                var yCoord = data.y;
+                                var canSpell = xCoord >= 0 && xCoord < gamestates.xNum
+                                    && yCoord >= 0 && yCoord < gamestates.yNum
+                                    && player.points >= skill['Points Limit']
+                                    && +(player.xPos - xCoord) <= skill['Range']
+                                    && +(player.yPos - yCoord) <= skill['Range']
+                                    && playersInGame.reduce((val, p) => val || (p.xPos === xCoord && p.yPos === yCoord), false);
+                                if (canSpell) {
+                                    var target = playersInGame.find((p) => p.xPos === xCoord && p.yPos === yCoord);
+                                    target.damage += skill['Damage'];
+                                    players.update(target);
+                                    player.points = 0;
+                                    players.update(player);
+                                }
+                                players.update(player);
+                                break;
+                            }
+                        }
+
+                        var prefetchedGamestate = prefetchPlayersData();
+                        var result = gameResult(prefetchedGamestate);
+                        setNextActivePlayer(prefetchedGamestate);
+
+                        socket.emit('onGameEvent', {success: true});
+                        players.data.forEach(p => {
+                            io.to(p.socket).emit('gameUpdated', {
+                                gameState: prefetchedGamestate,
+                                player: p
+                            });
+                        });
+
+                        if (result) {
+                            io.sockets.emit('gameEnded', {winner: result});
+                            Object.values(io.of("/").connected.forEach(() => {
+                                s.disconnect();
+                            }));
+                        }
+                    } else {
+                        socket.emit('onGameEvent', {success: false});
+                    }
                 });
             }
         });
